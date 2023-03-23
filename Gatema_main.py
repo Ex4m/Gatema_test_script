@@ -73,11 +73,12 @@ def sorted_dictionary(sections):
         if match:
             # Get the matched string using group() ... group returning exact matched value
             matched_string = match.group()
-            result_dict[matched_string] = section.strip()
+            result_dict[matched_string] = section
 
     # Sort the dictionary by keys and create a new dictionary with the sorted items
     sorted_dict = {key: result_dict[key] for key in sorted(result_dict)}
     return sorted_dict
+
 
 
 def min_max(content):
@@ -172,12 +173,27 @@ if __name__ == "__main__":
 
 
 
+with open("D327971_fc1.i") as f:
+    full = f.read()
+ # Create the pure content of the drill
+start_str = r"(M\d+, Zacatek bloku vrtani)"
+end_str = r"\n+\$\n+\(M\d{1,2}, Konec bloku vrtani\)"
+start_index = re.search(start_str, full)
+end_index = re.search(end_str, full)
+content = full[start_index.end():end_index.start()]
+header = full[0:start_index.end()+2]
+footer = full[end_index.start():]
+sections = section_separator(content)
+sorted_dict = sorted_dictionary(sections)
+sorted_dict = driller_adjuster(sorted_dict)
 
-
-
-
-
-
+print(sections[0])
+print(sorted_dict["T01"])
     
-    
-        
+pattern = r"T0\d+"
+result_dict = {}
+for section in sections:
+    match = re.search(pattern, section)     
+    matched_string = match.group()
+    result_dict[matched_string] = section
+    print(result_dict)
