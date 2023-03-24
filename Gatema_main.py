@@ -75,7 +75,7 @@ def sorted_dictionary(sections):
         if match:
             # Get the matched string using group() ... group returning exact matched value
             matched_string = match.group()
-            result_dict[matched_string] = section
+            result_dict[matched_string] = section.strip()
 
     # Sort the dictionary by keys and create a new dictionary with the sorted items
     sorted_dict = {key: result_dict[key] for key in sorted(result_dict)}
