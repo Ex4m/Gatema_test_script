@@ -1,5 +1,7 @@
 import re
 import argparse
+from decimal import Decimal
+
 
 
 def driller_adjuster(sorted_dict):
@@ -17,12 +19,12 @@ def driller_adjuster(sorted_dict):
         for line in lines:
             match = re.search(r"X(-?\d+\.\d+)Y(-?\d+\.\d+)(T0\d+)?$", line)
             if match:
-                x = float(match.group(1))
-                y = float(match.group(2))
+                x = Decimal(match.group(1))
+                y = Decimal(match.group(2))
                 t_code = match.group(3)
                 if x > 50:
-                    y += 10
-                    #Have to separate T0"x" values from standard rows
+                    y += Decimal('10')
+                    # Have to separate T0"x" values from standard rows
                     if t_code:
                         line = "X{}Y{}{}".format(x, y, t_code)
                     else:
@@ -172,28 +174,3 @@ if __name__ == "__main__":
 
 
 
-
-with open("D327971_fc1.i") as f:
-    full = f.read()
- # Create the pure content of the drill
-start_str = r"(M\d+, Zacatek bloku vrtani)"
-end_str = r"\n+\$\n+\(M\d{1,2}, Konec bloku vrtani\)"
-start_index = re.search(start_str, full)
-end_index = re.search(end_str, full)
-content = full[start_index.end():end_index.start()]
-header = full[0:start_index.end()+2]
-footer = full[end_index.start():]
-sections = section_separator(content)
-sorted_dict = sorted_dictionary(sections)
-sorted_dict = driller_adjuster(sorted_dict)
-
-print(sections[0])
-print(sorted_dict["T01"])
-    
-pattern = r"T0\d+"
-result_dict = {}
-for section in sections:
-    match = re.search(pattern, section)     
-    matched_string = match.group()
-    result_dict[matched_string] = section
-    print(result_dict)
