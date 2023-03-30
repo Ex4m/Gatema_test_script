@@ -3,39 +3,6 @@ import argparse
 from decimal import Decimal
 
 
-
-def driller_adjuster(sorted_dict):
-    """Modify the coordinates of the given sections in a sorted dictionary.
-
-    Args:
-        sorted_dict: A (un)sorted dictionary of sections with their corresponding codes.
-
-    Returns:
-        A modified sorted dictionary where the Y-coordinate of lines with X-coordinate > 50 has been increased by 10 units.
-    """
-    for key, value in sorted_dict.items():
-        lines = value.split("\n")
-        new_lines = []
-        for line in lines:
-            match = re.search(r"X(-?\d+\.\d+)Y(-?\d+\.\d+)(T0\d+)?$", line)
-            if match:
-                x = Decimal(match.group(1))
-                y = Decimal(match.group(2))
-                t_code = match.group(3)
-                if x > 50:
-                    y += Decimal('10')
-                    # Have to separate T0"x" values from standard rows
-                    if t_code:
-                        line = "X{}Y{}{}".format(x, y, t_code)
-                    else:
-                        line = "X{}Y{}".format(x, y)
-            new_lines.append(line)
-        sorted_dict[key] = "\n".join(new_lines)
-    return sorted_dict
-
-
-
-
 def section_separator(content):
     """Separate the content into sections based on the T-codes in the input text.
 
@@ -78,9 +45,40 @@ def sorted_dictionary(sections):
             result_dict[matched_string] = section.strip()
 
     # Sort the dictionary by keys and create a new dictionary with the sorted items
+    #sorted_dict = sorted(result_dict)
+    # dict comprehension
     sorted_dict = {key: result_dict[key] for key in sorted(result_dict)}
     return sorted_dict
 
+
+def driller_adjuster(sorted_dict):
+    """Modify the coordinates of the given sections in a sorted dictionary.
+
+    Args:
+        sorted_dict: A (un)sorted dictionary of sections with their corresponding codes.
+
+    Returns:
+        A modified sorted dictionary where the Y-coordinate of lines with X-coordinate > 50 has been increased by 10 units.
+    """
+    for key, value in sorted_dict.items():
+        lines = value.split("\n")
+        new_lines = []
+        for line in lines:
+            match = re.search(r"X(-?\d+\.\d+)Y(-?\d+\.\d+)(T0\d+)?$", line)
+            if match:
+                x = Decimal(match.group(1))
+                y = Decimal(match.group(2))
+                t_code = match.group(3)
+                if x > 50:
+                    y += Decimal('10')
+                    # Have to separate T0"x" values from standard rows
+                    if t_code:
+                        line = "X{}Y{}{}".format(x, y, t_code)
+                    else:
+                        line = "X{}Y{}".format(x, y)
+            new_lines.append(line)
+        sorted_dict[key] = "\n".join(new_lines)
+    return sorted_dict
 
 
 def min_max(content):
